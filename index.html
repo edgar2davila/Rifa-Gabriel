@@ -3,19 +3,18 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>La computadora de Gabriel · Gran rifa</title>
-<meta name="description" content="Rifa familiar para la computadora de Gabriel. Sorteo por la Loteria de Boyaca. Premio mayor $500.000 y segundo premio $300.000." />
+<title>La computadora de Gabriel · Una meta entre todos</title>
+<meta name="description" content="Ayúdame a lograr mi primera computadora. Una meta entre todos, con un sorteo de agradecimiento de $500.000 y $300.000 por la Lotería de Boyacá." />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Caveat:wght@600;700&family=Nunito:wght@400;600;700;800&family=JetBrains+Mono:wght@600;700&display=swap" rel="stylesheet" />
 <style>
   /* =======================================================================
-     LA COMPUTADORA DE GABRIEL - pagina de la rifa
-     Para mantenerla al dia edita el bloque CONFIG que esta al final del
-     archivo, dentro del area de codigo. Lo mas importante:
-       - CONFIG.vendidos  : lista de numeros ya vendidos (00 a 99)
-       - CONFIG.whatsapp  : tu numero de WhatsApp
-       - CONFIG.nequi / CONFIG.titular : datos de pago
+     LA COMPUTADORA DE GABRIEL - una meta entre todos
+     Para mantenerla al dia edita el bloque CONFIG al final del archivo:
+       - CONFIG.sheetCsvUrl : URL CSV publicada de Google Sheets (control en vivo)
+       - CONFIG.vendidos    : lista de respaldo si no usas la hoja
+       - CONFIG.whatsapp / CONFIG.nequi / CONFIG.titular : contacto y pago
      ======================================================================= */
   :root{
     --sky-top:#1668AE; --sky-mid:#3F9BD6; --sky-low:#A9DDF6;
@@ -38,13 +37,11 @@
   h1,h2,h3{font-family:"Baloo 2",system-ui,sans-serif;font-weight:800;line-height:1.05;margin:0;color:var(--ink);}
   a{color:var(--orange-d);}
   .wrap{max-width:var(--maxw);margin:0 auto;padding:0 22px;}
-  .eyebrow{font-family:"Baloo 2";font-weight:700;font-size:14px;letter-spacing:.12em;text-transform:uppercase;color:var(--orange);margin:0 0 12px;}
-  .script{font-family:"Caveat",cursive;font-weight:700;}
+  .eyebrow{font-family:"Baloo 2";font-weight:700;font-size:14px;letter-spacing:.1em;text-transform:uppercase;color:var(--orange);margin:0 0 12px;}
   section{padding:48px 0;}
   .sky-tint{background:linear-gradient(180deg,#EAF6FE,#F6FBFF);}
-  .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);border:0;}
 
-  /* ---------- HERO (cielo) ---------- */
+  /* ---------- HERO ---------- */
   .hero{position:relative;background:linear-gradient(180deg,var(--sky-top) 0%,var(--sky-mid) 48%,var(--sky-low) 100%);
     padding:18px 0 0;overflow:hidden;}
   .nav{position:relative;z-index:5;display:flex;align-items:center;justify-content:space-between;gap:12px;}
@@ -55,27 +52,34 @@
   .nav .links{display:flex;gap:18px;}
   .nav .links a{color:#EAF6FF;text-decoration:none;font-weight:700;font-size:14px;text-shadow:0 1px 3px rgba(8,45,80,.35);}
   .nav .links a:hover{color:#fff;}
-
-  .cloud-deco{position:absolute;pointer-events:none;opacity:.95;z-index:1;}
+  .cloud-deco{position:absolute;pointer-events:none;z-index:1;}
   .sun{position:absolute;top:26px;right:-30px;width:160px;height:160px;border-radius:50%;
     background:radial-gradient(circle,rgba(255,224,138,.85),rgba(255,224,138,0) 68%);z-index:1;pointer-events:none;}
-
-  .hero-inner{position:relative;z-index:4;text-align:center;padding:26px 22px 0;max-width:var(--maxw);margin:0 auto;}
-  .hero h1{color:#fff;font-size:clamp(40px,11vw,68px);letter-spacing:.01em;
+  .hero-inner{position:relative;z-index:4;text-align:center;padding:24px 22px 0;max-width:var(--maxw);margin:0 auto;}
+  .hero h1{color:#fff;font-size:clamp(38px,10vw,64px);letter-spacing:.01em;
     text-shadow:0 3px 0 rgba(8,45,80,.18),0 10px 26px rgba(8,45,80,.28);}
   .hero .sub{font-family:"Caveat",cursive;font-weight:700;color:#EAF7FF;font-size:clamp(24px,6vw,34px);
     margin:6px 0 0;text-shadow:0 2px 10px rgba(8,45,80,.3);}
-  .balloon{display:block;margin:6px auto -6px;width:clamp(150px,42vw,210px);height:auto;
+  .balloon{display:block;margin:8px auto -4px;width:clamp(120px,32vw,160px);height:auto;
     filter:drop-shadow(0 14px 18px rgba(8,45,80,.22));animation:bob 5s ease-in-out infinite;}
   @keyframes bob{0%,100%{transform:translateY(0) rotate(-1.5deg);}50%{transform:translateY(-12px) rotate(1.5deg);}}
 
-  .arrows{position:relative;display:flex;justify-content:center;gap:clamp(120px,52vw,260px);margin:4px 0 -6px;z-index:4;}
-  .arrows svg{width:46px;height:60px;color:var(--orange);filter:drop-shadow(0 4px 6px rgba(8,45,80,.25));}
-  .cloud-card{position:relative;z-index:4;background:#fff;border-radius:26px;max-width:440px;margin:8px auto 0;
-    padding:22px 22px 24px;box-shadow:0 16px 40px rgba(8,45,80,.18);}
-  .cloud-card .stat{font-weight:700;color:var(--body);font-size:15px;margin:0 0 16px;}
-  .cloud-card .stat b{color:var(--ink);}
-  .ctarow{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;}
+  .cloud-card{position:relative;z-index:4;background:#fff;border-radius:26px;max-width:520px;margin:14px auto 0;
+    padding:18px;box-shadow:0 16px 40px rgba(8,45,80,.18);text-align:left;}
+  .cloud-divider{display:block;width:100%;height:70px;margin-top:30px;position:relative;z-index:3;}
+
+  /* video */
+  .videoslot{position:relative;aspect-ratio:16/9;width:100%;border-radius:var(--radius);overflow:hidden;
+    background:linear-gradient(180deg,#DFF0FC,#CFE9FA);border:1px solid var(--line);
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;color:var(--sky-top);text-align:center;}
+  .videoslot .play{width:62px;height:62px;border-radius:50%;background:var(--orange);color:#fff;display:flex;align-items:center;justify-content:center;box-shadow:0 5px 0 var(--orange-d);}
+  .videoslot small{color:var(--body);font-size:13px;max-width:24em;}
+
+  /* mensaje de Gabriel */
+  .gmsg{margin:16px 0 0;font-size:16.5px;color:var(--ink);line-height:1.7;}
+  .gmsg .who{display:block;margin-top:10px;font-family:"Caveat",cursive;font-weight:700;font-size:22px;color:var(--green-d);}
+  .cloud-card .cta{display:flex;justify-content:center;margin-top:18px;}
+
   .btn{appearance:none;border:0;cursor:pointer;font-family:"Baloo 2";font-weight:700;font-size:17px;
     padding:14px 24px;border-radius:14px;display:inline-flex;align-items:center;gap:9px;text-decoration:none;
     transition:transform .12s ease,box-shadow .12s ease,background .15s ease;}
@@ -87,23 +91,15 @@
   .btn-wa{background:var(--green);color:#fff;box-shadow:0 5px 0 var(--green-d);}
   .btn-wa:hover{background:#62c052;}
 
-  .cloud-divider{display:block;width:100%;height:70px;margin-top:30px;position:relative;z-index:3;}
-
-  /* ---------- cards / secciones ---------- */
-  .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);
-    box-shadow:0 8px 24px rgba(22,58,92,.06);}
+  /* secciones generales */
   h2.sec{font-size:clamp(28px,7vw,38px);text-align:center;}
   .sec-lead{text-align:center;color:var(--body);margin:10px auto 0;max-width:32em;}
+  .sec-lead.first{color:var(--ink);font-size:18px;}
 
-  /* video + quote */
-  .videoslot{position:relative;aspect-ratio:16/9;width:100%;border-radius:var(--radius);overflow:hidden;
-    background:linear-gradient(180deg,#DFF0FC,#CFE9FA);border:1px solid var(--line);
-    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;color:var(--sky-top);text-align:center;}
-  .videoslot .play{width:62px;height:62px;border-radius:50%;background:var(--orange);color:#fff;display:flex;align-items:center;justify-content:center;box-shadow:0 5px 0 var(--orange-d);}
-  .videoslot small{color:var(--body);font-size:13px;max-width:24em;}
-  .quote{margin:20px 0 0;padding:20px 22px;background:var(--green-soft);border-radius:var(--radius);
-    border-left:5px solid var(--green);font-size:17px;color:var(--ink);}
-  .quote .who{display:block;margin-top:8px;font-size:14px;color:var(--green-d);}
+  /* caja crowdfunding */
+  .vaca{margin:22px auto 0;max-width:34em;background:#FFF7E6;border:1px solid #F4E2B4;border-radius:var(--radius);
+    padding:18px 20px;color:#6a4f12;font-size:15.5px;line-height:1.6;}
+  .vaca b{color:#8a5a00;}
 
   /* countdown */
   .count{background:linear-gradient(180deg,#1F73B6,#2E86C6);border-radius:var(--radius);padding:22px;color:#fff;text-align:center;box-shadow:0 12px 30px rgba(22,58,92,.18);}
@@ -169,7 +165,7 @@
   .ph-mark{background:var(--gold);color:#5a3d00;font-weight:700;padding:1px 8px;border-radius:6px;font-size:.92em;}
   .pay .pcash{margin-top:14px;padding-top:14px;border-top:1px solid rgba(255,255,255,.22);font-size:14px;color:#EFE8FB;}
 
-  /* why */
+  /* why / chips */
   .chips{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:20px;}
   .chip{background:#fff;border:1px solid var(--line);border-radius:22px;padding:8px 16px;font-weight:700;font-size:14px;color:var(--body);box-shadow:0 4px 12px rgba(22,58,92,.05);}
 
@@ -178,7 +174,10 @@
   .trust li{display:flex;gap:12px;align-items:flex-start;font-size:16px;color:var(--ink);}
   .trust li .ic{flex:0 0 auto;width:26px;height:26px;border-radius:50%;background:var(--green);color:#fff;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:800;}
   .trust li b{color:var(--ink);font-weight:800;}
+  .trust a{color:var(--orange-d);font-weight:700;}
   .note-confirm{margin:16px auto 0;max-width:34em;font-size:13px;color:#8a6b1f;background:#FFF5DA;border:1px solid #F2E2AE;border-radius:12px;padding:10px 14px;}
+  .ex-draw{margin:16px auto 0;max-width:34em;font-size:15px;color:var(--body);background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px 16px;box-shadow:0 4px 12px rgba(22,58,92,.05);}
+  .ex-draw b{color:var(--ink);}
 
   /* share */
   .share{text-align:center;}
@@ -195,75 +194,48 @@
   /* footer */
   footer{position:relative;background:linear-gradient(180deg,var(--sky-low),#8FD0F0);color:#fff;padding:70px 0 30px;text-align:center;margin-top:46px;}
   .grass{position:absolute;top:-1px;left:0;width:100%;height:60px;transform:translateY(-100%);display:block;}
+  .foot-balloon{position:absolute;top:16px;right:6%;width:clamp(58px,16vw,84px);height:auto;z-index:0;pointer-events:none;
+    filter:drop-shadow(0 8px 12px rgba(8,45,80,.2));animation:bob 5s ease-in-out infinite;}
+  footer .fmark, footer p{position:relative;z-index:1;}
   footer .fmark{font-family:"Baloo 2";font-weight:800;font-size:24px;color:#fff;text-shadow:0 2px 6px rgba(8,45,80,.25);}
   footer p{font-size:14px;color:#EAF7FF;margin:8px 0 0;}
 
-  @media (max-width:430px){
-    .nav .links{display:none;}
-    .arrows{gap:46vw;}
-    .count .u{max-width:none;}
-  }
-  @media (prefers-reduced-motion:reduce){
-    *{animation:none!important;transition:none!important;scroll-behavior:auto!important;}
-  }
+  @media (max-width:430px){ .nav .links{display:none;} .count .u{max-width:none;} }
+  @media (prefers-reduced-motion:reduce){ *{animation:none!important;transition:none!important;scroll-behavior:auto!important;} }
 </style>
 </head>
 <body>
 
 <header class="hero">
   <div class="sun" aria-hidden="true"></div>
-  <svg class="cloud-deco" style="top:90px;left:-30px;width:150px;" viewBox="0 0 120 60" aria-hidden="true"><g fill="#fff" opacity=".9"><circle cx="35" cy="38" r="20"/><circle cx="60" cy="28" r="26"/><circle cx="88" cy="38" r="20"/><ellipse cx="60" cy="48" rx="50" ry="14"/></g></svg>
+  <svg class="cloud-deco" style="top:90px;left:-30px;width:150px;opacity:.9;" viewBox="0 0 120 60" aria-hidden="true"><g fill="#fff"><circle cx="35" cy="38" r="20"/><circle cx="60" cy="28" r="26"/><circle cx="88" cy="38" r="20"/><ellipse cx="60" cy="48" rx="50" ry="14"/></g></svg>
   <svg class="cloud-deco" style="top:60px;right:10px;width:110px;opacity:.8;" viewBox="0 0 120 60" aria-hidden="true"><g fill="#fff"><circle cx="35" cy="38" r="18"/><circle cx="62" cy="30" r="24"/><circle cx="90" cy="40" r="16"/><ellipse cx="62" cy="48" rx="48" ry="12"/></g></svg>
-  <svg class="cloud-deco" style="top:230px;left:18px;width:90px;opacity:.85;" viewBox="0 0 120 60" aria-hidden="true"><g fill="#fff"><circle cx="35" cy="38" r="16"/><circle cx="60" cy="30" r="22"/><circle cx="86" cy="40" r="16"/><ellipse cx="60" cy="48" rx="46" ry="12"/></g></svg>
 
   <div class="wrap nav">
-    <div class="brand"><div class="mk">G</div><div class="nm">La rifa de Gabriel</div></div>
+    <div class="brand"><div class="mk">G</div><div class="nm">La meta de Gabriel</div></div>
     <nav class="links">
+      <a href="#apoyar">Cómo apoyar</a>
+      <a href="#tablero">Números</a>
       <a href="#premios">Premios</a>
-      <a href="#tablero">Numeros</a>
-      <a href="#participar">Participar</a>
       <a href="#compartir">Compartir</a>
     </nav>
   </div>
 
   <div class="hero-inner">
-    <p class="eyebrow" style="color:#FFD98A;">Gran rifa 2026</p>
+    <p class="eyebrow" style="color:#FFD98A;">Una meta entre todos · 2026</p>
     <h1>La computadora<br/>de Gabriel</h1>
-    <p class="sub">un sueno que hacemos realidad, numero a numero</p>
-
-    <svg class="balloon" viewBox="0 0 200 270" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Globo aerostatico subiendo entre nubes">
-      <defs><clipPath id="bc"><path d="M100,16 C150,16 172,60 172,106 C172,152 140,182 100,202 C60,182 28,152 28,106 C28,60 50,16 100,16 Z"/></clipPath></defs>
-      <line x1="60" y1="2" x2="60" y2="20" stroke="#DC6E0C" stroke-width="3"/>
-      <path d="M60,3 L82,9 L60,16 Z" fill="#FFC233"/>
-      <g clip-path="url(#bc)">
-        <rect x="28" y="10" width="24" height="200" fill="#F5811F"/>
-        <rect x="52" y="10" width="24" height="200" fill="#FFE0B0"/>
-        <rect x="76" y="10" width="24" height="200" fill="#F5811F"/>
-        <rect x="100" y="10" width="24" height="200" fill="#FFE0B0"/>
-        <rect x="124" y="10" width="24" height="200" fill="#F5811F"/>
-        <rect x="148" y="10" width="24" height="200" fill="#FFE0B0"/>
-        <ellipse cx="74" cy="62" rx="26" ry="40" fill="#fff" opacity=".22"/>
-      </g>
-      <path d="M100,16 C150,16 172,60 172,106 C172,152 140,182 100,202 C60,182 28,152 28,106 C28,60 50,16 100,16 Z" fill="none" stroke="#DC6E0C" stroke-width="4"/>
-      <path d="M86,200 L114,200 L110,216 L90,216 Z" fill="#C85E0A"/>
-      <line x1="90" y1="216" x2="92" y2="238" stroke="#8A5326" stroke-width="2.5"/>
-      <line x1="110" y1="216" x2="108" y2="238" stroke="#8A5326" stroke-width="2.5"/>
-      <rect x="86" y="236" width="28" height="22" rx="5" fill="#9A5B2A"/>
-      <rect x="86" y="236" width="28" height="7" rx="3" fill="#7E481F"/>
-      <path d="M150,40 l3,8 l8,3 l-8,3 l-3,8 l-3,-8 l-8,-3 l8,-3 z" fill="#FFD98A"/>
-    </svg>
-
-    <div class="arrows" aria-hidden="true">
-      <svg viewBox="0 0 24 32" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v22M5 19l7 7 7-7"/></svg>
-      <svg viewBox="0 0 24 32" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v22M5 19l7 7 7-7"/></svg>
-    </div>
+    <p class="sub">un sueño que hago realidad con tu ayuda</p>
 
     <div class="cloud-card">
-      <p class="stat">100 numeros · <b>$30.000</b> cada uno · premios de <b>$500.000</b> y <b>$300.000</b></p>
-      <div class="ctarow">
-        <a class="btn btn-primary" href="#tablero">Quiero mi numero</a>
-        <a class="btn btn-ghost" href="#compartir">Compartir</a>
+      <div class="videoslot" id="videoslot">
+        <div class="play" aria-hidden="true"><svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div>
+        <strong style="font-family:'Baloo 2';">Mi video</strong>
+        <small>Aquí va un video corto donde te cuento mi sueño. (Marcador, lo reemplazamos cuando esté listo.)</small>
       </div>
+      <p class="gmsg">¡Hola! Soy Gabriel, tengo 14 años. Mi sueño es tener mi primera computadora para estudiar, crear y aprender a programar. Me he esforzado y he ahorrado, y ahora quiero lograrlo con la ayuda de personas como tú. No te pido un regalo: te invito a sumarte a mi meta. Como agradecimiento, quienes me apoyan entran a un sorteo con dos premios en efectivo. Cada número me acerca un poquito más a mi sueño. ¿Te sumas?
+        <span class="who">— Gabriel</span>
+      </p>
+      <div class="cta"><a class="btn btn-primary" href="#apoyar">Quiero sumarme</a></div>
     </div>
   </div>
 
@@ -272,50 +244,46 @@
   </svg>
 </header>
 
-<section class="wrap" style="padding-top:20px;">
-  <p class="eyebrow" style="text-align:center;">Conoce a Gabriel</p>
-  <h2 class="sec">El sueno de Gabriel</h2>
-  <p class="sec-lead">Gabriel tiene 14 anos y una meta: su primera computadora para estudiar, crear y aprender a programar. Con tu numero lo ayudas a lograrlo.</p>
-  <div class="videoslot" id="videoslot" style="margin-top:22px;">
-    <div class="play" aria-hidden="true"><svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div>
-    <strong style="font-family:'Baloo 2';">Video de Gabriel</strong>
-    <small>Aqui ira un video corto de Gabriel contando su proyecto. (Marcador, lo reemplazamos cuando este listo.)</small>
+<section class="wrap" id="apoyar" style="padding-top:24px;">
+  <p class="eyebrow" style="text-align:center;">¿Cómo puedes apoyar?</p>
+  <h2 class="sec">Súmate a mi meta</h2>
+  <p class="sec-lead first">Es muy sencillo: eliges un número y aportas <b>$30.000</b>. Con eso impulsas mi meta y, para agradecerte, entras al sorteo de <b>$500.000</b> y <b>$300.000</b>, que se juega con la Lotería de Boyacá. Tu aporte ayuda… y además puede tener premio.</p>
+  <div class="vaca">
+    <b>¿Qué es esto exactamente?</b> Una meta entre todos: muchas personas aportan un poquito para lograr algo grande. Es una financiación colectiva —un <b>crowdfunding</b>—, o como decimos por aquí, una <b>“vaca”</b>… pero con premios.
   </div>
-  <blockquote class="quote">
-    "Estoy organizando esta rifa para comprar mi computadora. Cada numero me acerca a mi meta y me ensena el valor del esfuerzo. Gracias por apoyarme."
-    <span class="who">- Gabriel (mensaje de ejemplo, lo ajustamos con sus palabras)</span>
-  </blockquote>
+  <div style="text-align:center;margin-top:24px;"><a class="btn btn-primary" href="#tablero">Elige tu número</a></div>
 </section>
 
-<section class="wrap" style="padding-top:10px;">
+<section class="wrap" style="padding-top:6px;">
   <div class="count" id="count">
     <div class="clbl">Faltan para el sorteo</div>
     <div class="units">
-      <div class="u"><div class="n" id="cd-d">--</div><div class="s">dias</div></div>
+      <div class="u"><div class="n" id="cd-d">--</div><div class="s">días</div></div>
       <div class="u"><div class="n" id="cd-h">--</div><div class="s">horas</div></div>
       <div class="u"><div class="n" id="cd-m">--</div><div class="s">min</div></div>
       <div class="u"><div class="n" id="cd-s">--</div><div class="s">seg</div></div>
     </div>
-    <div class="date">Sabado <b>25 de julio de 2026</b> · Loteria de Boyaca</div>
+    <div class="date">Sábado <b>25 de julio de 2026</b> · Lotería de Boyacá</div>
   </div>
 </section>
 
 <section class="wrap sky-tint" style="border-radius:var(--radius);">
   <div style="padding:8px 0;">
-    <p class="eyebrow" style="text-align:center;">Vamos asi</p>
+    <p class="eyebrow" style="text-align:center;">Vamos así</p>
     <div class="prog-top">
-      <div class="prog-big"><span id="p-sold">0</span> <span>de 100 numeros</span></div>
+      <div class="prog-big"><span id="p-sold">0</span> <span>de 100 números</span></div>
       <div class="prog-left" id="p-left">Quedan 100</div>
     </div>
     <div class="bar"><i id="p-bar"></i></div>
-    <p class="prog-note">Cada numero vendido acerca a Gabriel a su computadora.</p>
+    <p class="prog-note">Cada número que se suma me acerca a mi computadora.</p>
   </div>
 </section>
 
 <section class="wrap" id="premios">
-  <p class="eyebrow" style="text-align:center;">Premios</p>
+  <p class="eyebrow" style="text-align:center;">Tu apoyo tiene premio</p>
   <h2 class="sec">Dos premios en efectivo</h2>
-  <div class="prizes" style="margin-top:28px;">
+  <p class="sec-lead">Para agradecer a quienes me apoyan, sorteo dos premios entre todos los números vendidos.</p>
+  <div class="prizes" style="margin-top:26px;">
     <div class="prize first">
       <div class="ribbon">Premio mayor</div>
       <div class="rank">1.er premio</div>
@@ -323,54 +291,54 @@
       <div class="psub">en efectivo</div>
     </div>
     <div class="prize">
-      <div class="rank">2.do premio</div>
+      <div class="rank">2.º premio</div>
       <div class="amt">$300.000</div>
       <div class="psub">en efectivo</div>
     </div>
   </div>
-  <p class="ticketval">Valor por numero: <b>$30.000</b></p>
-  <p class="one-winner">Un solo ganador por numero.</p>
+  <p class="ticketval">Valor por número: <b>$30.000</b></p>
+  <p class="one-winner">Un solo ganador por número.</p>
 </section>
 
 <section class="wrap" id="tablero">
-  <p class="eyebrow" style="text-align:center;">Elige tu numero</p>
-  <h2 class="sec">El tablero de la suerte</h2>
-  <p class="sec-lead">Toca un numero disponible y te abrimos WhatsApp con el mensaje listo para apartarlo.</p>
+  <p class="eyebrow" style="text-align:center;">Elige tu número y súmate</p>
+  <h2 class="sec">El tablero de la meta</h2>
+  <p class="sec-lead">Toca un número disponible y te abro WhatsApp con el mensaje listo para apartarlo.</p>
   <div class="legend">
     <span><i class="av"></i>Disponible</span>
-    <span><i class="so"></i>Vendido</span>
+    <span><i class="so"></i>Apartado</span>
   </div>
-  <div class="board" id="board" role="group" aria-label="Tablero de numeros del 00 al 99"></div>
+  <div class="board" id="board" role="group" aria-label="Tablero de números del 00 al 99"></div>
   <p class="board-foot" id="board-foot">Cargando tablero...</p>
 </section>
 
-<section class="wrap sky-tint" id="participar" style="border-radius:var(--radius);">
+<section class="wrap sky-tint" id="sumarte" style="border-radius:var(--radius);">
   <div style="padding:8px 0;">
-    <p class="eyebrow" style="text-align:center;">Como participar</p>
-    <h2 class="sec">Apartar tu numero en 4 pasos</h2>
+    <p class="eyebrow" style="text-align:center;">Cómo sumarte</p>
+    <h2 class="sec">Apartar tu número en 4 pasos</h2>
     <div class="steps" style="margin-top:24px;">
-      <div class="step"><div class="sn">1</div><div class="sx">Elige tu numero en el <b>tablero</b> de arriba.</div></div>
-      <div class="step"><div class="sn">2</div><div class="sx">Paga <b>$30.000</b> por Nequi o en efectivo.</div></div>
-      <div class="step"><div class="sn">3</div><div class="sx">Envia el <b>comprobante</b> por WhatsApp.</div></div>
-      <div class="step"><div class="sn">4</div><div class="sx">Te confirmamos y tu numero queda <b>apartado</b>.</div></div>
+      <div class="step"><div class="sn">1</div><div class="sx">Eliges tu número en el <b>tablero</b> de arriba.</div></div>
+      <div class="step"><div class="sn">2</div><div class="sx">Aportas <b>$30.000</b> por Nequi o en efectivo.</div></div>
+      <div class="step"><div class="sn">3</div><div class="sx">Me envías el <b>comprobante</b> por WhatsApp.</div></div>
+      <div class="step"><div class="sn">4</div><div class="sx">Te confirmo y tu número queda <b>apartado</b>.</div></div>
     </div>
     <div class="pay">
       <div class="ph">PAGA POR NEQUI</div>
-      <div class="pn" id="pay-nequi">300 000 0000</div>
-      <div class="pt">A nombre de <span class="ph-mark" id="pay-titular">(nombre del titular)</span></div>
-      <div class="pcash">Tambien puedes pagar en <b>efectivo</b>: coordinalo por WhatsApp y apartamos tu numero.</div>
+      <div class="pn" id="pay-nequi">322 973 8258</div>
+      <div class="pt">A nombre de <span class="ph-mark" id="pay-titular">Gabriel A.</span></div>
+      <div class="pcash">También puedes aportar en <b>efectivo</b>: lo coordinamos por WhatsApp y aparto tu número.</div>
     </div>
   </div>
 </section>
 
 <section class="wrap" style="text-align:center;">
-  <p class="eyebrow" style="text-align:center;">Por que esta rifa</p>
-  <h2 class="sec">Mas que una computadora</h2>
-  <p class="sec-lead">Esta es la primera campana de Gabriel: aprende a planear, comunicar, organizar y perseverar para alcanzar una meta de verdad. Aunque no ganes el premio, tu apoyo hace parte de algo real y de una leccion que le quedara para toda la vida.</p>
+  <p class="eyebrow" style="text-align:center;">Por qué lo hago</p>
+  <h2 class="sec">Más que una computadora</h2>
+  <p class="sec-lead">Este es mi primer proyecto: estoy aprendiendo a planear, comunicar, organizar y perseverar para alcanzar una meta de verdad. Aunque no ganes el premio, tu apoyo hace parte de algo real y de una lección que me quedará para toda la vida.</p>
   <div class="chips">
     <span class="chip">Emprendimiento</span>
-    <span class="chip">Comunicacion</span>
-    <span class="chip">Organizacion</span>
+    <span class="chip">Comunicación</span>
+    <span class="chip">Organización</span>
     <span class="chip">Perseverancia</span>
   </div>
 </section>
@@ -378,23 +346,23 @@
 <section class="wrap sky-tint" style="border-radius:var(--radius);text-align:center;">
   <div style="padding:8px 0;">
     <p class="eyebrow" style="text-align:center;">Confianza y transparencia</p>
-    <h2 class="sec">Como se elige al ganador</h2>
+    <h2 class="sec">Cómo se elige al ganador</h2>
     <ul class="trust" style="text-align:left;">
-      <li><span class="ic" aria-hidden="true">+</span><span>El sorteo se define con la <b>Loteria de Boyaca del sabado 25 de julio de 2026</b>.</span></li>
-      <li><span class="ic" aria-hidden="true">+</span><span><b>1.er premio:</b> las dos ultimas cifras del premio mayor.</span></li>
-      <li><span class="ic" aria-hidden="true">+</span><span><b>2.do premio:</b> esas mismas cifras invertidas.</span></li>
-      <li><span class="ic" aria-hidden="true">+</span><span>Un solo ganador por numero. Resultado <b>publico y verificable</b>.</span></li>
-      <li><span class="ic" aria-hidden="true">+</span><span>Organizado por la <b>familia de Gabriel</b>, con manejo transparente del dinero.</span></li>
+      <li><span class="ic" aria-hidden="true">+</span><span>El sorteo se define con la <b><a href="https://loteriadeboyaca.gov.co/" target="_blank" rel="noopener">Lotería de Boyacá</a> del sábado 25 de julio de 2026</b>.</span></li>
+      <li><span class="ic" aria-hidden="true">+</span><span><b>1.er premio:</b> las <b>dos últimas</b> cifras del número de la Lotería de Boyacá.</span></li>
+      <li><span class="ic" aria-hidden="true">+</span><span><b>2.º premio:</b> las <b>dos primeras</b> cifras del número de la Lotería de Boyacá.</span></li>
+      <li><span class="ic" aria-hidden="true">+</span><span>Un solo ganador por premio. Resultado <b>público y verificable</b>.</span></li>
+      <li><span class="ic" aria-hidden="true">+</span><span>Organizado por <b>Gabriel y su familia</b>, con manejo transparente de cada aporte.</span></li>
     </ul>
-    <p class="note-confirm">Nota para nosotros: confirmar la mecanica exacta del 2.do premio (invertir cifras u otra regla) y la regla de desempate si ambas coinciden.</p>
+    <p class="ex-draw">Ejemplo: si el número de la lotería es <b>4430</b>, el 1.er premio sería para el número <b>30</b> y el 2.º premio para el <b>44</b>.</p>
   </div>
 </section>
 
 <section class="wrap share" id="compartir">
-  <p class="eyebrow" style="text-align:center;">Ayudanos a llegar</p>
-  <h2 class="sec">Entre mas personas, mas cerca la meta</h2>
-  <p>Compartir la rifa tambien es ayudar. Cada persona que la conoce es un paso mas hacia la computadora de Gabriel.</p>
-  <a class="btn btn-wa" id="share-btn" href="https://wa.me/?text=Te%20invito%20a%20la%20rifa%20de%20la%20computadora%20de%20Gabriel.%20Elige%20tu%20numero." target="_blank" rel="noopener">
+  <p class="eyebrow" style="text-align:center;">Ayúdame a llegar</p>
+  <h2 class="sec">Entre más personas, más cerca la meta</h2>
+  <p>Compartir también es ayudar. Cada persona que conoce mi meta es un paso más hacia mi computadora.</p>
+  <a class="btn btn-wa" id="share-btn" href="https://wa.me/?text=Te%20invito%20a%20sumarte%20a%20la%20meta%20de%20Gabriel.%20Elige%20tu%20numero." target="_blank" rel="noopener">
     <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12.04 2c-5.46 0-9.91 4.45-9.91 9.91 0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21 5.46 0 9.91-4.45 9.91-9.91S17.5 2 12.04 2zm5.8 14.16c-.24.68-1.42 1.31-1.96 1.35-.5.07-.96.25-3.23-.67-2.72-1.07-4.45-3.84-4.59-4.02-.13-.18-1.1-1.46-1.1-2.79 0-1.33.7-1.98.95-2.25.24-.27.53-.34.71-.34.18 0 .36 0 .51.01.16.01.38-.06.6.46.24.56.78 1.92.85 2.06.07.13.12.29.02.47-.09.18-.14.29-.28.45-.14.16-.29.36-.42.48-.14.13-.28.27-.12.54.16.27.71 1.18 1.53 1.91 1.05.94 1.94 1.23 2.21 1.36.27.13.43.11.59-.07.16-.18.68-.79.86-1.07.18-.27.36-.22.6-.13.24.09 1.53.72 1.79.85.27.13.45.2.51.31.07.11.07.65-.17 1.33z"/></svg>
     Compartir por WhatsApp
   </a>
@@ -402,12 +370,12 @@
 
 <section class="wrap">
   <p class="eyebrow" style="text-align:center;">Preguntas frecuentes</p>
-  <h2 class="sec" style="margin-bottom:22px;">Resolvemos tus dudas</h2>
-  <details><summary>Puedo comprar mas de un numero?<span class="pl">+</span></summary><div class="ans">Claro, puedes apartar todos los que quieras. Mas numeros, mas oportunidades de ganar.</div></details>
-  <details><summary>Que pasa si gano?<span class="pl">+</span></summary><div class="ans">Te contactamos por WhatsApp apenas salga el resultado de la Loteria de Boyaca y coordinamos la entrega del premio en efectivo.</div></details>
-  <details><summary>Cuando y como es el sorteo?<span class="pl">+</span></summary><div class="ans">El sabado 25 de julio de 2026, con la Loteria de Boyaca. El numero ganador son las dos ultimas cifras del premio mayor, un resultado publico que cualquiera puede verificar.</div></details>
-  <details><summary>Como se que mi numero quedo apartado?<span class="pl">+</span></summary><div class="ans">Cuando recibimos tu comprobante de pago, te confirmamos por WhatsApp y marcamos tu numero como vendido en este tablero.</div></details>
-  <details><summary>Es seguro pagar por Nequi?<span class="pl">+</span></summary><div class="ans">Si. Pagas directamente a la cuenta de la familia de Gabriel y siempre te queda el comprobante de la transaccion.</div></details>
+  <h2 class="sec" style="margin-bottom:22px;">Te resuelvo tus dudas</h2>
+  <details><summary>¿Puedo apoyar con más de un número?<span class="pl">+</span></summary><div class="ans">Claro, puedes apartar todos los que quieras. Mientras más números, más me ayudas… y más oportunidades de ganar.</div></details>
+  <details><summary>¿Qué pasa si gano?<span class="pl">+</span></summary><div class="ans">Te contacto por WhatsApp apenas salga el resultado de la Lotería de Boyacá y coordinamos la entrega del premio en efectivo.</div></details>
+  <details><summary>¿Cuándo y cómo es el sorteo?<span class="pl">+</span></summary><div class="ans">El sábado 25 de julio de 2026, con la Lotería de Boyacá. El 1.er premio es para las dos últimas cifras del número y el 2.º premio para las dos primeras. Es un resultado público que cualquiera puede verificar.</div></details>
+  <details><summary>¿Cómo sé que mi número quedó apartado?<span class="pl">+</span></summary><div class="ans">Cuando recibo tu comprobante, te confirmo por WhatsApp y marco tu número como apartado en este tablero.</div></details>
+  <details><summary>¿Es seguro aportar por Nequi?<span class="pl">+</span></summary><div class="ans">Sí. Aportas directamente a mi Nequi y siempre te queda el comprobante de la transacción.</div></details>
 </section>
 
 <footer>
@@ -416,8 +384,28 @@
     <path fill="#58B24A" d="M0,90 L0,64 Q30,40 60,64 Q90,38 120,64 Q150,42 180,64 Q210,38 240,64 Q270,42 300,64 Q330,38 360,64 Q390,42 420,64 Q450,38 480,64 Q510,42 540,64 Q570,38 600,64 Q630,42 660,64 Q690,38 720,64 Q750,42 780,64 Q810,38 840,64 Q870,42 900,64 Q930,38 960,64 Q990,42 1020,64 Q1050,38 1080,64 Q1110,42 1140,64 Q1170,38 1200,64 Q1230,42 1260,64 Q1290,38 1320,64 Q1350,42 1380,64 Q1410,38 1440,64 L1440,90 Z"/>
   </svg>
   <div class="fmark">La computadora de Gabriel</div>
-  <p>Hecho con esfuerzo por Gabriel y su familia · 2026</p>
-  <p>Gracias por ser parte de este sueno.</p>
+  <svg class="foot-balloon" viewBox="0 0 200 270" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <defs><clipPath id="bcf"><path d="M100,16 C150,16 172,60 172,106 C172,152 140,182 100,202 C60,182 28,152 28,106 C28,60 50,16 100,16 Z"/></clipPath></defs>
+    <line x1="60" y1="2" x2="60" y2="20" stroke="#DC6E0C" stroke-width="3"/>
+    <path d="M60,3 L82,9 L60,16 Z" fill="#FFC233"/>
+    <g clip-path="url(#bcf)">
+      <rect x="28" y="10" width="24" height="200" fill="#F5811F"/>
+      <rect x="52" y="10" width="24" height="200" fill="#FFE0B0"/>
+      <rect x="76" y="10" width="24" height="200" fill="#F5811F"/>
+      <rect x="100" y="10" width="24" height="200" fill="#FFE0B0"/>
+      <rect x="124" y="10" width="24" height="200" fill="#F5811F"/>
+      <rect x="148" y="10" width="24" height="200" fill="#FFE0B0"/>
+      <ellipse cx="74" cy="62" rx="26" ry="40" fill="#fff" opacity=".22"/>
+    </g>
+    <path d="M100,16 C150,16 172,60 172,106 C172,152 140,182 100,202 C60,182 28,152 28,106 C28,60 50,16 100,16 Z" fill="none" stroke="#DC6E0C" stroke-width="4"/>
+    <path d="M86,200 L114,200 L110,216 L90,216 Z" fill="#C85E0A"/>
+    <line x1="90" y1="216" x2="92" y2="238" stroke="#8A5326" stroke-width="2.5"/>
+    <line x1="110" y1="216" x2="108" y2="238" stroke="#8A5326" stroke-width="2.5"/>
+    <rect x="86" y="236" width="28" height="22" rx="5" fill="#9A5B2A"/>
+    <rect x="86" y="236" width="28" height="7" rx="3" fill="#7E481F"/>
+  </svg>
+  <p>Hecho con esfuerzo por mí y mi familia · 2026</p>
+  <p>Gracias por ayudarme a lograr mi sueño.</p>
 </footer>
 
 <script>
@@ -425,30 +413,31 @@
    CONFIG - edita aqui para mantener la pagina al dia
    ========================================================================= */
 var CONFIG = {
-  // Numeros YA VENDIDOS (del 0 al 99). Agrega o quita numeros de esta lista,
-  // separados por coma, y vuelve a subir el archivo a GitHub para actualizar
-  // el tablero. Ejemplo: vendidos: [0, 5, 23, 47, 88]
-  vendidos: [3, 7, 12, 28, 33, 41, 55, 68, 70, 82, 91],
+  // ---- CONTROL EN VIVO CON GOOGLE SHEETS (recomendado) ----
+  // Pega aqui la URL CSV publicada de tu hoja (ver instrucciones).
+  // Si la dejas vacia, se usa la lista "vendidos" de abajo como respaldo.
+  sheetCsvUrl: "",
 
-  // WhatsApp de contacto (solo digitos, con indicativo 57, sin + ni espacios).
-  // Ejemplo Colombia: "573001234567"
-  whatsapp: "573000000000",
+  // ---- RESPALDO MANUAL ----
+  // Si no usas Google Sheets, marca aqui los numeros ya apartados (0 a 99).
+  // Ejemplo: vendidos: [0, 5, 23, 47, 88]
+  vendidos: [],
 
-  // Datos de pago
-  nequi: "300 000 0000",
-  titular: "(nombre del titular)",
+  // ---- CONTACTO Y PAGO ----
+  whatsapp: "573229738258",      // solo digitos, con indicativo 57
+  nequi: "322 973 8258",
+  titular: "Gabriel A.",
 
-  // Fecha y hora del sorteo (hora de Colombia, UTC-5)
+  // ---- SORTEO ----
   sorteo: "2026-07-25T22:30:00-05:00",
 
-  // URL publica de esta pagina (para el boton compartir). Reemplazala por la
-  // de GitHub Pages, ej: "https://usuario.github.io/rifa-gabriel/"
+  // ---- URL publica de esta pagina (para el boton compartir) ----
   siteUrl: ""
 };
 
-function buildBoard(){
-  var vendidos = {};
-  for (var k = 0; k < CONFIG.vendidos.length; k++){ vendidos[CONFIG.vendidos[k]] = true; }
+function buildBoard(takenList){
+  var taken = {};
+  for (var k = 0; k < takenList.length; k++){ taken[takenList[k]] = true; }
   var board = document.getElementById('board');
   var foot = document.getElementById('board-foot');
   var waBase = "https://wa.me/" + CONFIG.whatsapp;
@@ -458,20 +447,20 @@ function buildBoard(){
   var soldCount = 0;
   for (var i = 0; i < 100; i++){
     var nn = (i < 10 ? '0' : '') + i;
-    var sold = vendidos[i] === true;
-    if (sold){
+    var isTaken = taken[i] === true;
+    if (isTaken){
       soldCount++;
       var span = document.createElement('span');
       span.className = 'cell sold';
       span.textContent = nn;
-      span.setAttribute('aria-label', 'Numero ' + nn + ', vendido');
+      span.setAttribute('aria-label', 'Numero ' + nn + ', apartado');
       board.appendChild(span);
     } else {
       var a = document.createElement('a');
       a.className = 'cell';
       a.textContent = nn;
       a.setAttribute('aria-label', 'Numero ' + nn + ', disponible. Apartar por WhatsApp.');
-      var msg = 'Hola! Quiero apartar el numero ' + nn + ' de la rifa de la computadora de Gabriel.';
+      var msg = 'Hola Gabriel! Quiero apartar el numero ' + nn + ' y sumarme a tu meta.';
       a.href = waBase + '?text=' + encodeURIComponent(msg);
       a.target = '_blank';
       a.rel = 'noopener';
@@ -482,16 +471,70 @@ function buildBoard(){
   var available = 100 - soldCount;
   if (foot){
     foot.textContent = available === 0
-      ? 'Ya estan todos los numeros vendidos.'
+      ? 'Ya no queda ningun numero disponible.'
       : 'Quedan ' + available + ' de 100 disponibles.';
   }
-
   var pSold = document.getElementById('p-sold');
   var pLeft = document.getElementById('p-left');
   var pBar = document.getElementById('p-bar');
   if (pSold) pSold.textContent = soldCount;
   if (pLeft) pLeft.textContent = available === 0 ? 'Completo' : 'Quedan ' + available;
   if (pBar) setTimeout(function(){ pBar.style.width = soldCount + '%'; }, 120);
+}
+
+function deacc(s){
+  try { return s.normalize('NFD').replace(/[\u0300-\u036f]/g, ''); }
+  catch (e) { return s; }
+}
+
+function parseCSV(text){
+  var rows = [], row = [], field = '', inq = false, c;
+  for (var i = 0; i < text.length; i++){
+    c = text.charAt(i);
+    if (inq){
+      if (c === '"'){
+        if (text.charAt(i+1) === '"'){ field += '"'; i++; }
+        else inq = false;
+      } else field += c;
+    } else {
+      if (c === '"') inq = true;
+      else if (c === ','){ row.push(field); field = ''; }
+      else if (c === '\n'){ row.push(field); rows.push(row); row = []; field = ''; }
+      else if (c === '\r'){ /* nada */ }
+      else field += c;
+    }
+  }
+  if (field.length > 0 || row.length > 0){ row.push(field); rows.push(row); }
+  return rows;
+}
+
+function loadSheet(){
+  if (!CONFIG.sheetCsvUrl || typeof fetch !== 'function') return;
+  fetch(CONFIG.sheetCsvUrl, { cache: 'no-store' })
+    .then(function(r){ return r.text(); })
+    .then(function(text){
+      var rows = parseCSV(text);
+      if (!rows.length) return;
+      var head = [];
+      for (var x = 0; x < rows[0].length; x++){ head.push(deacc((rows[0][x] || '').trim().toLowerCase())); }
+      var iNum = head.indexOf('numero');
+      var iEst = head.indexOf('estado');
+      var start = 1;
+      if (iNum === -1){ iNum = 0; iEst = 1; start = 0; } // sin encabezado: col0=numero, col1=estado
+      var taken = [];
+      for (var r = start; r < rows.length; r++){
+        var cells = rows[r];
+        if (!cells || !cells.length) continue;
+        var numRaw = (cells[iNum] || '').trim();
+        if (numRaw === '') continue;
+        var num = parseInt(numRaw, 10);
+        if (isNaN(num) || num < 0 || num > 99) continue;
+        var est = deacc(((iEst > -1 ? cells[iEst] : '') || '').trim().toLowerCase());
+        if (est !== '' && est !== 'disponible'){ taken.push(num); }
+      }
+      buildBoard(taken);
+    })
+    .catch(function(e){ /* si falla, queda el respaldo ya pintado */ });
 }
 
 function startCountdown(){
@@ -506,7 +549,7 @@ function startCountdown(){
   function render(){
     var diff = target - Date.now();
     if (diff <= 0){
-      if (box) box.innerHTML = '<div class="clbl">El sorteo</div><div class="date" style="margin-top:8px;font-size:18px;">Ya se realizo. Pronto publicamos el resultado.</div>';
+      if (box) box.innerHTML = '<div class="clbl">El sorteo</div><div class="date" style="margin-top:8px;font-size:18px;">El sorteo ya se hizo. Pronto comparto el resultado.</div>';
       clearInterval(iv);
       return;
     }
@@ -527,15 +570,16 @@ function initPayShare(){
   if (t) t.textContent = CONFIG.titular;
   if (btn){
     var url = CONFIG.siteUrl || window.location.href;
-    var shareText = 'Te invito a la rifa de la computadora de Gabriel. Numeros a $30.000, premio mayor $500.000 y segundo premio $300.000. Sorteo por la Loteria de Boyaca. Mira y elige tu numero: ' + url;
+    var shareText = 'Te invito a sumarte a la meta de Gabriel: su primera computadora. Eliges un numero de $30.000 y entras al sorteo de $500.000 y $300.000 por la Loteria de Boyaca. Mira y elige tu numero: ' + url;
     btn.href = 'https://wa.me/?text=' + encodeURIComponent(shareText);
   }
 }
 
 function initRifa(){
-  try { buildBoard(); } catch (e) {}
+  try { buildBoard(CONFIG.vendidos || []); } catch (e) {}
   try { startCountdown(); } catch (e) {}
   try { initPayShare(); } catch (e) {}
+  try { loadSheet(); } catch (e) {}
 }
 
 if (document.readyState === 'loading'){
@@ -546,3 +590,4 @@ if (document.readyState === 'loading'){
 </script>
 </body>
 </html>
+
