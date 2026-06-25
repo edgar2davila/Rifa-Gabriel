@@ -138,6 +138,7 @@
   .legend{display:flex;gap:18px;justify-content:center;margin:14px 0 18px;font-size:14px;font-weight:700;color:var(--body);}
   .legend i{width:15px;height:15px;border-radius:5px;display:inline-block;vertical-align:-2px;margin-right:6px;}
   .legend .av{background:var(--green);}
+  .legend .re{background:#F4B53F;}
   .legend .so{background:var(--sold);border:1px solid #C2D6E6;}
   .board{display:grid;grid-template-columns:repeat(10,1fr);gap:6px;}
   .cell{aspect-ratio:1;border:0;border-radius:11px;cursor:pointer;font-family:"Nunito";font-weight:800;
@@ -149,6 +150,8 @@
   .cell:focus-visible{outline:3px solid var(--orange);outline-offset:2px;}
   .cell.sold{background:var(--sold);color:var(--sold-ink);cursor:not-allowed;text-decoration:line-through;box-shadow:none;}
   .cell.sold:hover{transform:none;background:var(--sold);box-shadow:none;}
+  .cell.res{background:#F4B53F;color:#6a4a05;cursor:not-allowed;box-shadow:none;}
+  .cell.res:hover{transform:none;background:#F4B53F;box-shadow:none;}
   .board-foot{margin:16px 0 0;font-family:"Baloo 2";font-weight:600;font-size:15px;color:var(--body);text-align:center;}
 
   /* steps + pay */
@@ -190,6 +193,16 @@
   summary .pl{color:var(--orange);font-weight:800;transition:transform .2s ease;}
   details[open] summary .pl{transform:rotate(45deg);}
   details .ans{padding:0 18px 16px;color:var(--body);font-size:16px;}
+
+  /* muro de impulsores */
+  .muro-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-top:24px;}
+  .imp{position:relative;display:flex;align-items:center;gap:10px;background:#fff;border:1px solid var(--line);border-radius:14px;padding:10px 12px;box-shadow:0 4px 12px rgba(22,58,92,.05);}
+  .imp .av{width:38px;height:38px;border-radius:50%;flex:0 0 auto;display:flex;align-items:center;justify-content:center;font-family:"Baloo 2";font-weight:700;font-size:15px;color:#fff;}
+  .imp .nm{font-family:"Baloo 2";font-weight:700;font-size:15px;color:var(--ink);line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .imp .meta{font-size:12.5px;color:var(--body);}
+  .imp .crown{position:absolute;top:-9px;left:26px;line-height:0;transform:rotate(8deg);}
+  .imp-count{display:block;margin-top:6px;font-family:"Baloo 2";font-weight:700;color:var(--green-d);}
+  .muro-empty{text-align:center;color:var(--body);background:var(--green-soft);border:1px solid #CDE9C4;border-radius:var(--radius);padding:22px;margin-top:20px;font-weight:600;}
 
   /* footer */
   footer{position:relative;background:linear-gradient(180deg,var(--sky-low),#8FD0F0);color:#fff;padding:70px 0 30px;text-align:center;margin-top:46px;}
@@ -306,7 +319,8 @@
   <p class="sec-lead">Toca un número disponible y te abro WhatsApp con el mensaje listo para apartarlo.</p>
   <div class="legend">
     <span><i class="av"></i>Disponible</span>
-    <span><i class="so"></i>Apartado</span>
+    <span><i class="re"></i>Reservado</span>
+    <span><i class="so"></i>Vendido</span>
   </div>
   <div class="board" id="board" role="group" aria-label="Tablero de números del 00 al 99"></div>
   <p class="board-foot" id="board-foot">Cargando tablero...</p>
@@ -378,6 +392,16 @@
   <details><summary>¿Es seguro aportar por Nequi?<span class="pl">+</span></summary><div class="ans">Sí. Aportas directamente a mi Nequi y siempre te queda el comprobante de la transacción.</div></details>
 </section>
 
+<section class="wrap sky-tint" id="comunidad" style="border-radius:var(--radius);">
+  <div style="padding:8px 0;">
+    <p class="eyebrow" style="text-align:center;">Comunidad</p>
+    <h2 class="sec">Gracias a quienes me apoyan</h2>
+    <p class="sec-lead">Estas son las personas que ya confirmaron su aporte y me ayudan a subir.<span class="imp-count" id="imp-count"></span></p>
+    <div class="muro-grid" id="muro"></div>
+    <p class="muro-empty" id="muro-empty" style="display:none;">Aún no hay nadie en el muro. ¡Sé la primera persona en sumarte!</p>
+  </div>
+</section>
+
 <footer>
   <svg class="grass" viewBox="0 0 1440 90" preserveAspectRatio="none" aria-hidden="true">
     <path fill="#3F8F36" d="M0,90 L0,52 Q40,18 80,52 Q120,16 160,52 Q200,20 240,52 Q280,14 320,52 Q360,20 400,52 Q440,16 480,52 Q520,20 560,52 Q600,14 640,52 Q680,20 720,52 Q760,16 800,52 Q840,20 880,52 Q920,14 960,52 Q1000,20 1040,52 Q1080,16 1120,52 Q1160,20 1200,52 Q1240,14 1280,52 Q1320,20 1360,52 Q1400,16 1440,52 L1440,90 Z"/>
@@ -435,27 +459,18 @@ var CONFIG = {
   siteUrl: "https://edgar2davila.github.io/Rifa-Gabriel/"
 };
 
-function buildBoard(takenList){
-  var taken = {};
-  for (var k = 0; k < takenList.length; k++){ taken[takenList[k]] = true; }
+function buildBoard(stateMap){
   var board = document.getElementById('board');
   var foot = document.getElementById('board-foot');
   var waBase = "https://wa.me/" + CONFIG.whatsapp;
   if (!board) return;
   board.innerHTML = "";
 
-  var soldCount = 0;
+  var taken = 0;
   for (var i = 0; i < 100; i++){
     var nn = (i < 10 ? '0' : '') + i;
-    var isTaken = taken[i] === true;
-    if (isTaken){
-      soldCount++;
-      var span = document.createElement('span');
-      span.className = 'cell sold';
-      span.textContent = nn;
-      span.setAttribute('aria-label', 'Numero ' + nn + ', apartado');
-      board.appendChild(span);
-    } else {
+    var est = stateMap[i] || 'disponible';
+    if (est === 'disponible'){
       var a = document.createElement('a');
       a.className = 'cell';
       a.textContent = nn;
@@ -465,10 +480,17 @@ function buildBoard(takenList){
       a.target = '_blank';
       a.rel = 'noopener';
       board.appendChild(a);
+    } else {
+      taken++;
+      var span = document.createElement('span');
+      span.className = 'cell ' + (est === 'reservado' ? 'res' : 'sold');
+      span.textContent = nn;
+      span.setAttribute('aria-label', 'Numero ' + nn + ', ' + est);
+      board.appendChild(span);
     }
   }
 
-  var available = 100 - soldCount;
+  var available = 100 - taken;
   if (foot){
     foot.textContent = available === 0
       ? 'Ya no queda ningun numero disponible.'
@@ -477,9 +499,82 @@ function buildBoard(takenList){
   var pSold = document.getElementById('p-sold');
   var pLeft = document.getElementById('p-left');
   var pBar = document.getElementById('p-bar');
-  if (pSold) pSold.textContent = soldCount;
+  if (pSold) pSold.textContent = taken;
   if (pLeft) pLeft.textContent = available === 0 ? 'Completo' : 'Quedan ' + available;
-  if (pBar) setTimeout(function(){ pBar.style.width = soldCount + '%'; }, 120);
+  if (pBar) setTimeout(function(){ pBar.style.width = taken + '%'; }, 120);
+}
+
+function normEstado(raw){
+  var e = deacc((raw || '').trim().toLowerCase());
+  if (e === '' || e === 'disponible') return 'disponible';
+  if (e.indexOf('vend') === 0 || e.indexOf('pag') === 0) return 'vendido';
+  if (e.indexOf('reserv') === 0 || e.indexOf('apart') === 0) return 'reservado';
+  return 'reservado';
+}
+
+var AVPAL = ['#58B24A','#3F9BD6','#F5811F','#7A39C9','#1F73B6','#E0922A','#2BA17C','#D8602F'];
+function hashName(s){ var h = 0; for (var i = 0; i < s.length; i++){ h = (h * 31 + s.charCodeAt(i)) % 100000; } return h; }
+function escapeHtml(s){ return (s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function pad2(n){ return (n < 10 ? '0' : '') + n; }
+function initials(name){
+  var parts = name.split(/\s+/), out = '';
+  for (var i = 0; i < parts.length && out.length < 2; i++){ if (parts[i]) out += parts[i].charAt(0); }
+  return out.toUpperCase();
+}
+
+function buildMuro(ventas){
+  var grid = document.getElementById('muro');
+  var empty = document.getElementById('muro-empty');
+  var countEl = document.getElementById('imp-count');
+  if (!grid) return;
+  grid.innerHTML = '';
+
+  var named = {}, order = [], anon = [];
+  for (var i = 0; i < ventas.length; i++){
+    var name = (ventas[i].comprador || '').trim();
+    var key = deacc(name.toLowerCase());
+    if (name === '' || key === 'anonimo'){ anon.push(ventas[i].num); }
+    else {
+      if (!named[key]){ named[key] = { name: name, nums: [] }; order.push(key); }
+      named[key].nums.push(ventas[i].num);
+    }
+  }
+  var fichas = [];
+  for (var o = 0; o < order.length; o++){
+    var g = named[order[o]];
+    g.nums.sort(function(a,b){ return a - b; });
+    fichas.push({ name: g.name, nums: g.nums, anon: false });
+  }
+  fichas.sort(function(a,b){
+    if (b.nums.length !== a.nums.length) return b.nums.length - a.nums.length;
+    return a.name.localeCompare(b.name);
+  });
+  for (var z = 0; z < anon.length; z++){ fichas.push({ name: 'An\u00f3nimo', nums: [anon[z]], anon: true }); }
+
+  if (fichas.length === 0){
+    grid.style.display = 'none';
+    if (empty) empty.style.display = 'block';
+    if (countEl) countEl.textContent = '';
+    return;
+  }
+  grid.style.display = '';
+  if (empty) empty.style.display = 'none';
+  if (countEl) countEl.textContent = 'Ya somos ' + fichas.length + (fichas.length === 1 ? ' persona' : ' personas') + '.';
+
+  var crownSvg = '<span class="crown" aria-hidden="true"><svg viewBox="0 0 24 24" width="18" height="18" fill="#F2A516" stroke="#C8881A" stroke-width="1.2" stroke-linejoin="round"><path d="M3 8l4.5 3.5L12 5l4.5 6.5L21 8l-1.8 10.5H4.8z"/></svg></span>';
+  for (var f = 0; f < fichas.length; f++){
+    var fi = fichas[f];
+    var multi = fi.nums.length > 1;
+    var meta = multi ? (fi.nums.length + ' n\u00fameros') : ('n\u00famero ' + pad2(fi.nums[0]));
+    var ini = fi.anon ? '?' : initials(fi.name);
+    var color = fi.anon ? '#9DB2C2' : AVPAL[hashName(fi.name) % AVPAL.length];
+    var el = document.createElement('div');
+    el.className = 'imp';
+    el.innerHTML = (multi ? crownSvg : '') +
+      '<div class="av" style="background:' + color + '">' + escapeHtml(ini) + '</div>' +
+      '<div style="min-width:0;"><div class="nm">' + escapeHtml(fi.name) + '</div><div class="meta">' + meta + '</div></div>';
+    grid.appendChild(el);
+  }
 }
 
 function deacc(s){
@@ -519,9 +614,12 @@ function loadSheet(){
       for (var x = 0; x < rows[0].length; x++){ head.push(deacc((rows[0][x] || '').trim().toLowerCase())); }
       var iNum = head.indexOf('numero');
       var iEst = head.indexOf('estado');
+      var iCom = head.indexOf('comprador');
       var start = 1;
-      if (iNum === -1){ iNum = 0; iEst = 1; start = 0; } // sin encabezado: col0=numero, col1=estado
-      var taken = [];
+      if (iNum === -1){ iNum = 0; iEst = 1; iCom = 2; start = 0; } // sin encabezado
+      var stateMap = {};
+      for (var z = 0; z < 100; z++){ stateMap[z] = 'disponible'; }
+      var ventas = [];
       for (var r = start; r < rows.length; r++){
         var cells = rows[r];
         if (!cells || !cells.length) continue;
@@ -529,10 +627,15 @@ function loadSheet(){
         if (numRaw === '') continue;
         var num = parseInt(numRaw, 10);
         if (isNaN(num) || num < 0 || num > 99) continue;
-        var est = deacc(((iEst > -1 ? cells[iEst] : '') || '').trim().toLowerCase());
-        if (est !== '' && est !== 'disponible'){ taken.push(num); }
+        var est = normEstado(iEst > -1 ? cells[iEst] : '');
+        stateMap[num] = est;
+        if (est === 'vendido'){
+          var comp = iCom > -1 ? (cells[iCom] || '').trim() : '';
+          ventas.push({ num: num, comprador: comp });
+        }
       }
-      buildBoard(taken);
+      buildBoard(stateMap);
+      buildMuro(ventas);
     })
     .catch(function(e){ /* si falla, queda el respaldo ya pintado */ });
 }
@@ -576,7 +679,14 @@ function initPayShare(){
 }
 
 function initRifa(){
-  try { buildBoard(CONFIG.vendidos || []); } catch (e) {}
+  try {
+    var fb = {};
+    for (var i = 0; i < 100; i++){ fb[i] = 'disponible'; }
+    var v = CONFIG.vendidos || [];
+    for (var j = 0; j < v.length; j++){ fb[v[j]] = 'vendido'; }
+    buildBoard(fb);
+    if (!CONFIG.sheetCsvUrl){ buildMuro([]); }
+  } catch (e) {}
   try { startCountdown(); } catch (e) {}
   try { initPayShare(); } catch (e) {}
   try { loadSheet(); } catch (e) {}
@@ -590,4 +700,5 @@ if (document.readyState === 'loading'){
 </script>
 </body>
 </html>
+
 
