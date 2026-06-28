@@ -68,12 +68,11 @@
     padding:18px;box-shadow:0 16px 40px rgba(8,45,80,.18);text-align:left;}
   .cloud-divider{display:block;width:100%;height:70px;margin-top:30px;position:relative;z-index:3;}
 
-  /* video */
-  .videoslot{position:relative;aspect-ratio:16/9;width:100%;border-radius:var(--radius);overflow:hidden;
-    background:linear-gradient(180deg,#DFF0FC,#CFE9FA);border:1px solid var(--line);
-    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;color:var(--sky-top);text-align:center;}
-  .videoslot .play{width:62px;height:62px;border-radius:50%;background:var(--orange);color:#fff;display:flex;align-items:center;justify-content:center;box-shadow:0 5px 0 var(--orange-d);}
-  .videoslot small{color:var(--body);font-size:13px;max-width:24em;}
+  /* video vertical */
+  .videowrap{position:relative;width:100%;max-width:300px;margin:0 auto;aspect-ratio:9/16;
+    border-radius:var(--radius);overflow:hidden;background:#0D2436;box-shadow:0 10px 30px rgba(8,45,80,.18);}
+  .videowrap video{width:100%;height:100%;object-fit:contain;display:block;background:#0D2436;}
+  .videocap{text-align:center;font-size:13px;color:var(--body);margin:10px 0 0;}
 
   /* mensaje de Gabriel */
   .gmsg{margin:16px 0 0;font-size:16.5px;color:var(--ink);line-height:1.7;}
@@ -240,11 +239,13 @@
     <p class="sub">un sueño que hago realidad con tu ayuda</p>
 
     <div class="cloud-card">
-      <div class="videoslot" id="videoslot">
-        <div class="play" aria-hidden="true"><svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div>
-        <strong style="font-family:'Baloo 2';">Mi video</strong>
-        <small>Aquí va un video corto donde te cuento mi sueño. (Marcador, lo reemplazamos cuando esté listo.)</small>
+      <div class="videowrap">
+        <video id="videoGabriel" controls playsinline webkit-playsinline preload="metadata" poster="">
+          <source src="video-gabriel.mp4" type="video/mp4" />
+          Tu navegador no puede reproducir el video. <a href="video-gabriel.mp4">Descárgalo aquí</a>.
+        </video>
       </div>
+      <p class="videocap">Mira mi video y conoce mi sueño</p>
       <p class="gmsg">¡Hola! Soy Gabriel, tengo 14 años. Mi sueño es tener mi primera computadora para estudiar, crear y aprender a programar. Me he esforzado y he ahorrado, y ahora quiero lograrlo con la ayuda de personas como tú. No te pido un regalo: te invito a sumarte a mi meta. Como agradecimiento, quienes me apoyan entran a un sorteo con dos premios en efectivo. Cada número me acerca un poquito más a mi sueño. ¿Te sumas?
         <span class="who">— Gabriel</span>
       </p>
@@ -450,10 +451,10 @@ var CONFIG = {
   // ---- CONTACTO Y PAGO ----
   whatsapp: "573229738258",      // solo digitos, con indicativo 57
   nequi: "322 973 8258",
-  titular: "Gabriel A.",
+  titular: "Gabriel",
 
   // ---- SORTEO ----
-  sorteo: "2026-07-25T22:30:00-05:00",
+  sorteo: "2026-07-25T22:42:00-05:00",
 
   // ---- URL publica de esta pagina (para el boton compartir) ----
   siteUrl: "https://edgar2davila.github.io/Rifa-Gabriel/"
@@ -700,5 +701,3 @@ if (document.readyState === 'loading'){
 </script>
 </body>
 </html>
-
-
