@@ -202,6 +202,12 @@
   .imp .crown{position:absolute;top:-9px;left:26px;line-height:0;transform:rotate(8deg);}
   .imp-count{display:block;margin-top:6px;font-family:"Baloo 2";font-weight:700;color:var(--green-d);}
   .muro-empty{text-align:center;color:var(--body);background:var(--green-soft);border:1px solid #CDE9C4;border-radius:var(--radius);padding:22px;margin-top:20px;font-weight:600;}
+  .imp.premium{background:linear-gradient(180deg,#FFF7E2,#FFFDF6);border:2px solid var(--gold);box-shadow:0 10px 24px rgba(200,136,26,.18);}
+  .imp .av-wrap{position:relative;flex:0 0 auto;}
+  .imp.premium .av{box-shadow:0 0 0 3px var(--gold);}
+  .imp .medal{position:absolute;bottom:-4px;right:-4px;width:19px;height:19px;border-radius:50%;background:var(--gold);display:flex;align-items:center;justify-content:center;border:2px solid #fff;box-shadow:0 2px 4px rgba(0,0,0,.15);}
+  .imp .premium-tag{margin:3px 0;}
+  .imp .toplbl{display:inline-block;background:linear-gradient(180deg,#FFD24A,#F2A516);color:#5a3d00;font-family:"Baloo 2";font-weight:700;font-size:10.5px;letter-spacing:.02em;padding:2px 9px;border-radius:20px;box-shadow:0 2px 0 var(--gold-d);}
 
   /* footer */
   footer{position:relative;background:linear-gradient(180deg,var(--sky-low),#8FD0F0);color:#fff;padding:70px 0 30px;text-align:center;margin-top:46px;}
@@ -289,7 +295,7 @@
       <div class="prog-left" id="p-left">Quedan 100</div>
     </div>
     <div class="bar"><i id="p-bar"></i></div>
-    <p class="prog-note">Cada número que se suma me acerca a mi meta.</p>
+    <p class="prog-note">Cada número que se suma me acerca a mi computadora.</p>
   </div>
 </section>
 
@@ -457,7 +463,11 @@ var CONFIG = {
   sorteo: "2026-07-25T22:42:00-05:00",
 
   // ---- URL publica de esta pagina (para el boton compartir) ----
-  siteUrl: "https://edgar2davila.github.io/Rifa-Gabriel/"
+  siteUrl: "https://jisusgd.github.io/meta-gabriel/",
+
+  // ---- MURO: nivel premium (a partir de cuantos numeros, y su etiqueta) ----
+  premiumMin: 5,
+  premiumLabel: "Top impulsor"
 };
 
 function buildBoard(stateMap){
@@ -563,17 +573,27 @@ function buildMuro(ventas){
   if (countEl) countEl.textContent = 'Ya somos ' + fichas.length + (fichas.length === 1 ? ' persona' : ' personas') + '.';
 
   var crownSvg = '<span class="crown" aria-hidden="true"><svg viewBox="0 0 24 24" width="18" height="18" fill="#F2A516" stroke="#C8881A" stroke-width="1.2" stroke-linejoin="round"><path d="M3 8l4.5 3.5L12 5l4.5 6.5L21 8l-1.8 10.5H4.8z"/></svg></span>';
+  var medalSvg = '<svg viewBox="0 0 24 24" width="12" height="12" fill="#5a3d00"><path d="M12 2l2.9 6.3 6.9.7-5.1 4.6 1.4 6.8L12 17.8 5.9 20.4l1.4-6.8L2.2 9l6.9-.7z"/></svg>';
+  var pmin = CONFIG.premiumMin || 5;
+  var plabel = CONFIG.premiumLabel || 'Top impulsor';
   for (var f = 0; f < fichas.length; f++){
     var fi = fichas[f];
-    var multi = fi.nums.length > 1;
-    var meta = multi ? (fi.nums.length + ' n\u00fameros') : ('n\u00famero ' + pad2(fi.nums[0]));
+    var n = fi.nums.length;
+    var premium = n >= pmin;
+    var crown = n >= 2 && n < pmin;
+    var meta = (n > 1) ? (n + ' n\u00fameros') : ('n\u00famero ' + pad2(fi.nums[0]));
     var ini = fi.anon ? '?' : initials(fi.name);
     var color = fi.anon ? '#9DB2C2' : AVPAL[hashName(fi.name) % AVPAL.length];
+    var avInner = '<div class="av" style="background:' + color + '">' + escapeHtml(ini) + '</div>';
+    var avHtml = premium
+      ? ('<div class="av-wrap">' + avInner + '<span class="medal" aria-hidden="true">' + medalSvg + '</span></div>')
+      : avInner;
+    var textCol = premium
+      ? ('<div class="nm">' + escapeHtml(fi.name) + '</div><div class="premium-tag"><span class="toplbl">' + escapeHtml(plabel) + '</span></div><div class="meta">' + meta + '</div>')
+      : ('<div class="nm">' + escapeHtml(fi.name) + '</div><div class="meta">' + meta + '</div>');
     var el = document.createElement('div');
-    el.className = 'imp';
-    el.innerHTML = (multi ? crownSvg : '') +
-      '<div class="av" style="background:' + color + '">' + escapeHtml(ini) + '</div>' +
-      '<div style="min-width:0;"><div class="nm">' + escapeHtml(fi.name) + '</div><div class="meta">' + meta + '</div></div>';
+    el.className = 'imp' + (premium ? ' premium' : '');
+    el.innerHTML = (crown ? crownSvg : '') + avHtml + '<div style="min-width:0;">' + textCol + '</div>';
     grid.appendChild(el);
   }
 }
